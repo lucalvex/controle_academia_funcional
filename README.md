@@ -36,3 +36,15 @@ O objetivo é implementar um sistema simples de **controle de treinos** (sessõe
 ---
 
 ## 🔹 Estrutura do Projeto
+
+## 🔹 Como Executar
+
+1. Certifique-se de ter o **Gleam** instalado.  
+   [Guia de instalação oficial](https://gleam.run/getting-started/)
+
+2. Clone este repositório ou copie os arquivos do projeto.
+
+3. Compile e execute o programa com:
+
+```bash
+.\sgleam controle_treino
