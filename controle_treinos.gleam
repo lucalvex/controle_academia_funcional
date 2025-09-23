@@ -49,11 +49,24 @@ pub fn adicionar_treino() -> List(Treino) {
   treinos
 }
 
-pub fn atualizar_status(){}
+pub fn atualizar_status(treinos: List(Treino)) -> List(Treino){
+  io.println("Treinos atualizados \n")
+  list.map(treinos, fn(treino) {
+    case treino.status {
+      Pendente -> Treino(..treino, status: EmAndamento)
+      EmAndamento -> Treino(..treino, status: Concluido)
+      Concluido -> remover_concluidos(treinos, treino.id)
+    }
+  })
+}
 
 pub fn filtrar_por_status(){}
 
-pub fn remover_concluidos(){}
+pub fn remover_concluidos(treinos: List(Treino), idtreino: Int) -> List(Treino) {
+  list.filter(treinos, fn(treino) {
+    treino.id != idtreino
+  })
+}
 
 pub fn visualizar_treinos(treinos: List(Treino)) {
   io.println("------ Lista de treinos --------\n")
@@ -76,14 +89,13 @@ pub fn contar_por_status(){}
 
 pub fn listar_proximas_data(){}
 
-fn status_to_string(s: Status) -> String {
+pub fn status_to_string(s: Status) -> String {
   case s {
     Pendente -> "Pendente"
     EmAndamento -> "Em andamento"
     Concluido -> "Concluído"
   }
 }
-
 
 // Principal
 pub fn main(){
@@ -92,12 +104,14 @@ pub fn main(){
 
   // Criando treinos
   let treinos1 = adicionar_treino()
-  // let treinos2 = adicionar_treino()
 
   // Vizualizacao
   io.println("Seu treino foi criado com sucesso!")
   visualizar_treinos(treinos1)
-  // visualizar_treinos(treinos2)
+
+  // Atualização
+  let treinos1 = atualizar_status(treinos1)
+  visualizar_treinos(treinos1)
 }
 
 
