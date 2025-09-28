@@ -1,15 +1,16 @@
+import gleam/int
 import gleam/io
 import gleam/list
-import gleam/int
+import gleam/string
 
 // Modelagens com ADTs (Algebraic Data Types)
 pub type Treino {
-  Treino (
+  Treino(
     id: Int,
     titulo: String,
     descricao: String,
     data: String,
-    status: Status
+    status: Status,
   )
 }
 
@@ -23,22 +24,8 @@ pub type Status {
 pub fn criar_treino() -> List(Treino) {
   // Essa função cria os treinos individualmente e adiciona ao uma lista de treinos 
   // A função retorna uma lista de treinos
-  let treino1 = Treino (
-    0,
-    "Treino de perna",
-    "Pernas",
-    "10/10/2025",
-    Pendente
-  )
-
-  let treino2 = Treino (
-    1,
-    "Treino de braço",
-    "Braço",
-    "11/10/2025",
-    EmAndamento
-  )
-
+  let treino1 = Treino(0, "Treino de perna", "Pernas", "11/11/2025", Pendente)
+  let treino2 = Treino(0, "Treino de perna", "Pernas", "10/11/2025", EmAndamento)
   let treinos = [treino1, treino2]
   treinos
 }
@@ -49,23 +36,30 @@ pub fn adicionar_treino() -> List(Treino) {
   treinos
 }
 
-pub fn atualizar_status(treinos: List(Treino)) -> List(Treino){
+// Atualiza status dos treinos
+// Se for concluido remove da lista chamanando a funcao remover_concluidos
+pub fn atualizar_status(treinos: List(Treino)) -> List(Treino) {
   io.println("Treinos atualizados \n")
   list.map(treinos, fn(treino) {
     case treino.status {
       Pendente -> Treino(..treino, status: EmAndamento)
       EmAndamento -> Treino(..treino, status: Concluido)
-      Concluido -> remover_concluidos(treinos, treino.id)
+      Concluido -> Treino(..treino, status: Concluido)
     }
   })
 }
 
-pub fn filtrar_por_status(){}
+pub fn filtrar_por_status (
+  treinos: List(Treino),
+  status_filtro: Status,
+) -> List(Treino) {
+  list.filter(treinos, fn(treino) { treino.status == status_filtro })
+}
 
-pub fn remover_concluidos(treinos: List(Treino), idtreino: Int) -> List(Treino) {
-  list.filter(treinos, fn(treino) {
-    treino.id != idtreino
-  })
+// Remover treinos concluidos
+
+pub fn remover_concluidos(treinos: List(Treino)) -> List(Treino) {
+  list.filter(treinos, fn(treino) { treino.status != Concluido })
 }
 
 pub fn visualizar_treinos(treinos: List(Treino)) {
@@ -85,9 +79,15 @@ pub fn visualizar_treinos(treinos: List(Treino)) {
 }
 
 // Operações derivadas
-pub fn contar_por_status(){}
+pub fn contar_por_status(treinos: List(Treino), status: Status) -> Int {
+  treinos
+  |> filtrar_por_status(status)
+  |> list.length()
+}
 
-pub fn listar_proximas_data(){}
+pub fn listar_proximas_data(treinos: List(Treino)) -> List(Treino) {
+  list.sort(treinos, fn(a, b) { string.compare(a.data, b.data) })
+}
 
 pub fn status_to_string(s: Status) -> String {
   case s {
@@ -98,7 +98,7 @@ pub fn status_to_string(s: Status) -> String {
 }
 
 // Principal
-pub fn main(){
+pub fn main() {
   io.println("Bem-vindo à academia Treinos Gleam")
   io.println("Iremos criar seu treino, só um minuto...\n")
 
@@ -107,13 +107,27 @@ pub fn main(){
 
   // Vizualizacao
   io.println("Seu treino foi criado com sucesso!")
-  visualizar_treinos(treinos1)
+  io.println("Seus treinos estão ordenados pro data:\n")
+  let prox_treino = listar_proximas_data(treinos1)
+  visualizar_treinos(prox_treino)
 
   // Atualização
   let treinos1 = atualizar_status(treinos1)
+  io.println("Seus treinos foram atualizados com sucesso!\n")
   visualizar_treinos(treinos1)
+  
+  let treinos_concluidos = filtrar_por_status(treinos1, Concluido)
+  // Remover treinos concluidos
+  case treinos_concluidos  {
+    [] -> io.println("Nenhum treino concluído.\n")
+    _ -> {
+      let treinos1 = remover_concluidos(treinos1)
+      io.println("Treinos concluídos removidos da lista.\n")
+      visualizar_treinos(treinos1)
+      let count_concluidos = contar_por_status(treinos_concluidos, Concluido)
+      io.println("Total de treinos concluídos: " <> int.to_string(count_concluidos) <> "\n")
+    }
+  }
+
+  
 }
-
-
-
-
